@@ -55,23 +55,26 @@ PARSER_FILES=(
 > $JS_COMBINED_FILE
 > $JS_COMBINED_FILE_MIN
 
+# Add header
+sed '/CODE_HERE/,$d' < Sheet/wrapper.js  >> $JS_COMBINED_FILE
+
 #run thru the JS files
 for F in ${JS_FILES[@]}; do
-  CONTENTS=$(<"$JS_IN_DIR/$F")
-  JS_TEMP+="$CONTENTS"
+   cat $JS_IN_DIR/$F >> $JS_COMBINED_FILE
 done
 
-echo "${JS_WRAPPER//CODE_HERE/"$JS_TEMP"}" > $JS_COMBINED_FILE
+# Add footer
+sed '1,/CODE_HERE/d' < Sheet/wrapper.js  >> $JS_COMBINED_FILE
+#echo "${JS_WRAPPER//CODE_HERE/$JS_TEMP}" > $JS_COMBINED_FILE
 
 #run thru the parser files
 for F in ${PARSER_FILES[@]}; do
-  CONTENTS=$(<"$F")
-  echo "$CONTENTS" >> $JS_COMBINED_FILE
+  cat $F >> $JS_COMBINED_FILE
 done
 
 #compress it
 yui-compressor -o $JS_COMBINED_FILE_MIN $JS_COMBINED_FILE
 
 #add the file to the git base
-git add $JS_COMBINED_FILE
-git add $JS_COMBINED_FILE_MIN
+#git add $JS_COMBINED_FILE
+#git add $JS_COMBINED_FILE_MIN
